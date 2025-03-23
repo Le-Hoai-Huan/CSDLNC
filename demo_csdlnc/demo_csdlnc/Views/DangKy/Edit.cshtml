@@ -1,0 +1,65 @@
+﻿@model demo_csdlnc.Models.DangKy
+
+@{
+    ViewData["Title"] = "Edit";
+    var userRole = Context.Session.GetString("Role");
+}
+
+<h1>Edit</h1>
+
+<h4>DangKy</h4>
+<hr />
+
+@if (userRole == "Admin" || userRole == "NguoiXetDuyet")
+{
+    <form asp-action="Edit">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <input type="hidden" asp-for="MaDangKy" />
+
+        <div class="form-group">
+            <label asp-for="MaSV" class="control-label"></label>
+            <select asp-for="MaSV" class="form-control" asp-items="ViewBag.MaSV"></select>
+            <span asp-validation-for="MaSV" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="NgayDangKy" class="control-label"></label>
+            <input asp-for="NgayDangKy" class="form-control" />
+            <span asp-validation-for="NgayDangKy" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="TrangThai" class="control-label"></label>
+            <select asp-for="TrangThai" class="form-control" asp-items="ViewBag.TrangThaiList">
+                <option value="">-- Chọn trạng thái --</option>
+            </select>
+            <span asp-validation-for="TrangThai" class="text-danger"></span>
+        </div>
+
+
+
+        <div class="form-group">
+            <label asp-for="MaNguoiXetDuyet" class="control-label"></label>
+            <select asp-for="MaNguoiXetDuyet" class="form-control" asp-items="ViewBag.MaNguoiXetDuyet"></select>
+            <span asp-validation-for="MaNguoiXetDuyet" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <input type="submit" value="Save" class="btn btn-primary" />
+        </div>
+    </form>
+}
+else
+{
+    <div class="alert alert-danger">Bạn không có quyền chỉnh sửa thông tin này.</div>
+}
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

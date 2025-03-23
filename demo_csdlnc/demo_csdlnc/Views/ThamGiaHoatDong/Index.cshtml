@@ -1,0 +1,39 @@
+﻿@model List<demo_csdlnc.Models.ThamGiaHoatDong>
+
+@{
+    ViewData["Title"] = "Danh sách tham gia hoạt động";
+}
+
+<h2>Danh sách tham gia hoạt động</h2>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Thêm hoạt động mới</a>
+</p>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Tên sinh viên</th>
+            <th>Tên hoạt động</th>
+            <th>Ngày tham gia</th>
+            <th>Điểm số</th>
+            <th>Hành động</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+                <tr>
+                    <td>@item.SinhVien.HoTen</td>
+                    <td>@item.TenHoatDong</td>
+                    <td>@item.NgayThamGia.ToString("dd/MM/yyyy")</td>
+                    <td>@item.DiemSo</td>
+                    <td>
+                        <a asp-action="Details" asp-route-id="@item.MaThamGia" class="btn btn-info btn-sm">Chi tiết</a>
+                        <a asp-action="Edit" asp-route-id="@item.MaThamGia" class="btn btn-warning btn-sm">Sửa</a>
+                        <a asp-action="Delete" asp-route-id="@item.MaThamGia" class="btn btn-danger btn-sm">Xóa</a>
+                    </td>
+                </tr>
+        }
+    </tbody>
+</table>

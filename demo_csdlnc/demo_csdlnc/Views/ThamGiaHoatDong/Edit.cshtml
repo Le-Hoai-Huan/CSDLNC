@@ -1,0 +1,42 @@
+﻿@model demo_csdlnc.Models.ThamGiaHoatDong
+
+@{
+    ViewData["Title"] = "Chỉnh sửa tham gia hoạt động";
+}
+
+<h2>Chỉnh sửa tham gia hoạt động</h2>
+
+<form asp-action="Edit" method="post">
+    <input type="hidden" asp-for="MaThamGia" />
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div class="form-group">
+        <label asp-for="MaSV" class="control-label">Sinh viên</label>
+        <select asp-for="MaSV" class="form-control" asp-items="ViewBag.MaSV"></select>
+        <span asp-validation-for="MaSV" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="TenHoatDong" class="control-label"></label>
+        <input asp-for="TenHoatDong" class="form-control" />
+        <span asp-validation-for="TenHoatDong" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="NgayThamGia" class="control-label"></label>
+        <input asp-for="NgayThamGia" class="form-control" type="date" />
+        <span asp-validation-for="NgayThamGia" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="DiemSo" class="control-label"></label>
+        <input asp-for="DiemSo" class="form-control" />
+        <span asp-validation-for="DiemSo" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <input type="submit" value="Lưu" class="btn btn-primary" />
+        <a asp-action="Index" class="btn btn-secondary">Hủy</a>
+    </div>
+</form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

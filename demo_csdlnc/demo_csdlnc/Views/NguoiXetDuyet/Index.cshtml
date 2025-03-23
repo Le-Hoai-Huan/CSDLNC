@@ -1,0 +1,55 @@
+﻿@model IEnumerable<demo_csdlnc.Models.NguoiXetDuyet>
+
+@{
+    ViewData["Title"] = "Danh sách người xét duyệt";
+}
+
+<h1 class="mb-4">Người Xét Duyệt</h1>
+
+<p>
+    <a asp-action="Create" class="btn btn-success"><i class="bi bi-plus-lg"></i> Thêm mới</a>
+</p>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <table class="table table-hover table-bordered">
+            <thead class="table-primary text-center">
+                <tr>
+                    <th>@Html.DisplayNameFor(model => model.HoTen)</th>
+                    <th>@Html.DisplayNameFor(model => model.Email)</th>
+                    <th>@Html.DisplayNameFor(model => model.SoDienThoai)</th>
+                    <th>@Html.DisplayNameFor(model => model.Account)</th>
+                    <th>Hành động</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@Html.DisplayFor(modelItem => item.HoTen)</td>
+                        <td>@Html.DisplayFor(modelItem => item.Email)</td>
+                        <td>@Html.DisplayFor(modelItem => item.SoDienThoai)</td>
+                        <td>@Html.DisplayFor(modelItem => item.Account.MaAccount)</td>
+                        <td class="text-center">
+                            <a asp-action="Edit" asp-route-id="@item.MaNguoiXetDuyet" class="btn btn-warning btn-sm">
+                                <i class="bi bi-pencil-square"></i> Sửa
+                            </a>
+                            <a asp-action="Details" asp-route-id="@item.MaNguoiXetDuyet" class="btn btn-info btn-sm">
+                                <i class="bi bi-eye"></i> Xem
+                            </a>
+                            <a asp-action="Delete" asp-route-id="@item.MaNguoiXetDuyet" class="btn btn-danger btn-sm">
+                                <i class="bi bi-trash"></i> Xóa
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

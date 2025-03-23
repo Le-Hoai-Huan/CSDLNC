@@ -1,0 +1,39 @@
+﻿@model List<demo_csdlnc.Models.TieuChiSinhVien>
+
+@{
+    ViewData["Title"] = "Danh sách đánh giá tiêu chí";
+}
+
+<h2>Danh sách đánh giá tiêu chí</h2>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Thêm đánh giá mới</a>
+</p>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Tên sinh viên</th>
+            <th>Tiêu chí</th>
+            <th>Điểm</th>
+            <th>Nhận xét</th>
+            <th>Hành động</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+                <tr>
+                    <td>@item.SinhVien.HoTen</td>
+                    <td>@item.TieuChi.TenTieuChi</td>
+                    <td>@item.Diem</td>
+                    <td>@item.NhanXet</td>
+                    <td>
+                        <a asp-action="Details" asp-route-id="@item.MaDanhGia" class="btn btn-info btn-sm">Chi tiết</a>
+                        <a asp-action="Edit" asp-route-id="@item.MaDanhGia" class="btn btn-warning btn-sm">Sửa</a>
+                        <a asp-action="Delete" asp-route-id="@item.MaDanhGia" class="btn btn-danger btn-sm">Xóa</a>
+                    </td>
+                </tr>
+        }
+    </tbody>
+</table>
