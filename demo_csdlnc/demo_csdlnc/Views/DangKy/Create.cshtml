@@ -1,40 +1,63 @@
 ﻿@model demo_csdlnc.Models.DangKy
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Đăng Ký";
+    var userRole = Context.Session.GetString("Role");
+    var maSinhVien = ViewBag.MaSV;
 }
 
-<h1>Create</h1>
-
-<h4>DangKy</h4>
+<h1 class="mb-4 text-primary">Đăng Ký</h1>
+<h4 class="text-muted">Tham gia chương trình Sinh viên 5 tốt</h4>
 <hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="MaSV" class="control-label">Họ Tên</label>
-                <select asp-for="MaSV" class ="form-control" asp-items="ViewBag.MaSV"></select>
-            </div>
-           
-            <div class="form-group">
-                <label asp-for="NgayDangKy" class="control-label"></label>
-                <input asp-for="NgayDangKy" class="form-control" />
-                <span asp-validation-for="NgayDangKy" class="text-danger"></span>
-            </div>
-           
-           
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
+
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow-lg p-4">
+            <form asp-action="Create">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <!-- Chọn Sinh Viên -->
+                <div class="form-group mb-3">
+                    @if (userRole == "SinhVien")
+                    {
+                        <label class="form-label fw-bold">Bạn có chắc muốn tham gia Sinh viên 5 tốt không?</label>
+                        <input type="hidden" asp-for="MaSV" value="@maSinhVien" />
+                        <input type="hidden" class="form-control" value="@maSinhVien" readonly disabled />
+                    }
+                    else
+                    {
+                        <label asp-for="MaSV" class="form-label fw-bold">Chọn Sinh Viên</label>
+                        <select asp-for="MaSV" class="form-select" asp-items="ViewBag.MaSV"></select>
+                    }
+                </div>
+
+                <!-- Ngày Đăng Ký -->
+                <div class="form-group mb-3">
+                    <label asp-for="NgayDangKy" class="form-label fw-bold">Ngày Đăng Ký</label>
+                    <input asp-for="NgayDangKy" class="form-control" placeholder="Chọn ngày đăng ký" autofocus />
+                    <span asp-validation-for="NgayDangKy" class="text-danger"></span>
+                </div>
+
+                <!-- Nút Submit -->
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-primary fw-bold">
+                        <i class="fas fa-check-circle"></i> Xác Nhận Đăng Ký
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
+<!-- Quay lại -->
+<div class="text-center mt-4">
+    <a asp-action="Index" class="btn btn-outline-secondary">
+        <i class="fas fa-arrow-left"></i> Quay lại danh sách
+    </a>
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

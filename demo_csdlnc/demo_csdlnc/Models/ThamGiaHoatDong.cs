@@ -24,6 +24,6 @@ namespace demo_csdlnc.Models
         public int DiemSo { get; set; }
 
         [ForeignKey("MaSV")]
-        public SinhVien SinhVien { get; set; }
+        public SinhVien? SinhVien { get; set; }
     }
 }

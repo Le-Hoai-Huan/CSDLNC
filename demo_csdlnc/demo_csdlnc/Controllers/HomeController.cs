@@ -15,8 +15,8 @@ public class HomeController : Controller
 
     public IActionResult Index()
     {
-        string username = HttpContext.Session.GetString("Username");
-        string role = HttpContext.Session.GetString("Role");
+        var username = HttpContext.Session.GetString("Username");
+        var role = HttpContext.Session.GetInt32("Role");
 
         ViewBag.Username = username;
         ViewBag.Role = role;

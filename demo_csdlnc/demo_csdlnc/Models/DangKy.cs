@@ -20,9 +20,9 @@ namespace demo_csdlnc.Models
         public int? MaNguoiXetDuyet { get; set; }
 
         [ForeignKey("MaSV")]
-        public SinhVien SinhVien { get; set; }
+        public SinhVien? SinhVien { get; set; }
 
         [ForeignKey("MaNguoiXetDuyet")]
-        public NguoiXetDuyet NguoiXetDuyet { get; set; }
+        public NguoiXetDuyet? NguoiXetDuyet { get; set; }
     }
 }

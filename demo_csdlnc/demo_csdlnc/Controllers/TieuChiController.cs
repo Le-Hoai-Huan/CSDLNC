@@ -28,7 +28,7 @@ namespace demo_csdlnc.Controllers
         // 🔹 2. Trang tạo tiêu chí mới
         public IActionResult Create()
         {
-            if (HttpContext.Session.GetString("Role") != "Admin")
+            if (HttpContext.Session.GetString("Role") != "Admin" && HttpContext.Session.GetString("Role") != "NguoiXetDuyet")
             {
                 return Unauthorized();
             }
@@ -39,7 +39,7 @@ namespace demo_csdlnc.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Create(TieuChi tieuChi)
         {
-            if (HttpContext.Session.GetString("Role") != "Admin")
+            if (HttpContext.Session.GetString("Role") != "Admin" && HttpContext.Session.GetString("Role") != "NguoiXetDuyet")
             {
                 return Unauthorized();
             }
@@ -55,7 +55,7 @@ namespace demo_csdlnc.Controllers
      
         public IActionResult Edit(int id)
         {
-            if (HttpContext.Session.GetString("Role") != "Admin")
+            if (HttpContext.Session.GetString("Role") != "Admin" && HttpContext.Session.GetString("Role") != "NguoiXetDuyet")
             {
                 return Unauthorized();
             }
@@ -71,7 +71,7 @@ namespace demo_csdlnc.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Edit(int id, TieuChi tieuChi)
         {
-            if (HttpContext.Session.GetString("Role") != "Admin")
+            if (HttpContext.Session.GetString("Role") != "Admin" && HttpContext.Session.GetString("Role") != "NguoiXetDuyet")
             {
                 return Unauthorized();
             }
@@ -93,7 +93,7 @@ namespace demo_csdlnc.Controllers
         // 🔹 4. Xóa tiêu chí
         public IActionResult Delete(int id)
         {
-            if (HttpContext.Session.GetString("Role") != "Admin")
+            if (HttpContext.Session.GetString("Role") != "Admin" && HttpContext.Session.GetString("Role") != "NguoiXetDuyet")
             {
                 return Unauthorized();
             }
@@ -110,7 +110,7 @@ namespace demo_csdlnc.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult DeleteConfirmed(int id)
         {
-            if (HttpContext.Session.GetString("Role") != "Admin")
+            if (HttpContext.Session.GetString("Role") != "Admin" && HttpContext.Session.GetString("Role") != "NguoiXetDuyet")
             {
                 return Unauthorized();
             }
