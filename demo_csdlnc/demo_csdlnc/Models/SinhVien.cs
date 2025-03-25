@@ -25,9 +25,13 @@ namespace demo_csdlnc.Models
 
         [Required(ErrorMessage = "Vui lòng chọn lớp")]
        
-        public int MaLop { get; set; }
+        public int? MaLop { get; set; }
         [ForeignKey("MaLop")]
-        public Lop Lop { get; set; }
+        public Lop? Lop { get; set; }
+
+        public int MaAccount { get; set; }
+        [ForeignKey("MaAccount")]
+        public Account? Account { get; set; }
 
     }
 

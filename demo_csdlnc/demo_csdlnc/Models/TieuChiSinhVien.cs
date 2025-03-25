@@ -21,9 +21,9 @@ namespace demo_csdlnc.Models
         public string NhanXet { get; set; }
 
         [ForeignKey("MaSV")]
-        public SinhVien SinhVien { get; set; }
+        public SinhVien? SinhVien { get; set; }
 
         [ForeignKey("MaTieuChi")]
-        public TieuChi TieuChi { get; set; }
+        public TieuChi? TieuChi { get; set; }
     }
 }

@@ -19,24 +19,35 @@ namespace demo_csdlnc.Controllers
         // 🔹 1. Hiển thị danh sách đăng ký
         public IActionResult Index()
         {
-            var userRole = HttpContext.Session.GetString("Role");
-            var userAccountIdStr = HttpContext.Session.GetString("MaAccount");
+            var role = HttpContext.Session.GetString("Role");
+            var userId = HttpContext.Session.GetInt32("UserId");
 
-            IQueryable<DangKy> dangKys = _context.DangKys
-                .Include(dk => dk.SinhVien)
-                .Include(dk => dk.NguoiXetDuyet);
-
-            if (userRole == "SinhVien" && int.TryParse(userAccountIdStr, out int userAccountId))
+            if (role == "Admin")
             {
-                dangKys = dangKys.Where(dk => dk.MaSV == userAccountId);
-            }
+                var dangKys = _context.DangKys
+                    .Include(dk => dk.SinhVien)  
+                    .Include(dk => dk.NguoiXetDuyet) 
+                    .ToList();
 
-            return View(dangKys.ToList());
+                return View(dangKys);
+            }
+            else if (role == "SinhVien" && userId.HasValue)
+            {
+                // Sinh viên chỉ xem đơn của chính mình
+                var sinhVienDangKy = _context.DangKys
+                    .Include(dk => dk.SinhVien)
+                    .Include(dk => dk.NguoiXetDuyet)
+                    .Where(dk => dk.SinhVien.MaAccount == userId.Value)
+                    .ToList();
+
+                return View(sinhVienDangKy);
+            }
+            else
+            {
+                return Unauthorized(); 
+            }
         }
 
-
-
-        // 🔹 2. Xem chi tiết đăng ký
         public IActionResult Details(int id)
         {
             var dangKy = _context.DangKys
@@ -52,18 +63,29 @@ namespace demo_csdlnc.Controllers
             return View(dangKy);
         }
 
-        // 🔹 3. Trang tạo đăng ký mới
-
         public IActionResult Create()
         {
-            var sinhViens = _context.SinhViens.ToList();
-            var nguoiXetDuyets = _context.NguoiXetDuyets.Include(n => n.Account).ToList();
+            var userRole = HttpContext.Session.GetString("Role");
+            var userId = HttpContext.Session.GetInt32("UserId");
 
-            ViewBag.MaSV = sinhViens.Any() ? new SelectList(sinhViens, "MaSV", "HoTen") : null;
-            ViewBag.MaNguoiXetDuyet = nguoiXetDuyets.Any() ? new SelectList(nguoiXetDuyets, "MaNguoiXetDuyet", "Account.Username") : null;
+            if (userRole == "SinhVien")
+            {
+                var sinhVien = _context.SinhViens.FirstOrDefault(s => s.MaAccount == userId);
+                if (sinhVien == null)
+                {
+                    return Unauthorized(); 
+                }
+
+                ViewBag.MaSV = sinhVien.MaSV; 
+            }
+            else
+            {
+                ViewBag.MaSV = new SelectList(_context.SinhViens, "MaSV", "HoTen");
+            }
 
             return View();
         }
+
 
 
 
@@ -72,18 +94,16 @@ namespace demo_csdlnc.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Create(DangKy dangKy)
         {
+
+            ViewBag.MaSV = new SelectList(_context.SinhViens, "MaSV", "HoTen");
+            ViewBag.MaNguoiXetDuyet = new SelectList(_context.NguoiXetDuyets, "MaNguoiXetDuyet", "Account.Username");
            
-                ViewBag.MaSV = new SelectList(_context.SinhViens, "MaSV", "HoTen");
-                ViewBag.MaNguoiXetDuyet = new SelectList(_context.NguoiXetDuyets, "MaNguoiXetDuyet", "Account.Username");
-
-
             dangKy.NgayDangKy = DateTime.Now;
             _context.DangKys.Add(dangKy);
             _context.SaveChanges();
             return RedirectToAction("Index");
         }
 
-        // 🔹 4. Chỉnh sửa đăng ký
         public IActionResult Edit(int id)
         {
             if (HttpContext.Session.GetString("Role") != "Admin")

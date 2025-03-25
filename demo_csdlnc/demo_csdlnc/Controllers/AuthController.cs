@@ -76,6 +76,7 @@ namespace demo_csdlnc.Controllers
             // Lưu thông tin đăng nhập vào Session
             HttpContext.Session.SetString("Username", account.Username);
             HttpContext.Session.SetString("Role", account.Role);
+            HttpContext.Session.SetInt32("UserId", account.MaAccount);
 
             return RedirectToAction("Index", "Home");
         }

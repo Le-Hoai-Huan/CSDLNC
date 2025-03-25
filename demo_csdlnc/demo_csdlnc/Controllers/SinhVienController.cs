@@ -5,6 +5,8 @@ using demo_csdlnc.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using static System.Runtime.InteropServices.JavaScript.JSType;
+using System.Data;
 
 namespace demo_csdlnc.Controllers
 {
@@ -19,45 +21,72 @@ namespace demo_csdlnc.Controllers
         }
         public IActionResult Index()
         {
-            if (HttpContext.Session.GetString("Role") != "Admin")
+            var role = HttpContext.Session.GetString("Role");
+            var userId = HttpContext.Session.GetInt32("UserId");
+            if (role == "Admin" || role=="NguoiXetDuyet")
+            {
+                var sinhViens = _context.SinhViens.Include(sv => sv.Lop).ToList();
+                return View(sinhViens);
+            }
+            else if (role == "SinhVien")
+            {
+                var sinhVien = _context.SinhViens
+                    .Include(sv => sv.Lop)
+                    .FirstOrDefault(sv => sv.MaAccount == userId.Value); 
+
+                if (sinhVien == null)
+                {
+                    return NotFound();
+                }
+
+                return View(new List<SinhVien> { sinhVien }); 
+            }
+            else
             {
                 return Unauthorized();
             }
-            var sinhViens = _context.SinhViens.Include(sv => sv.Lop).ToList();
-         
-            return View(sinhViens);
         }
 
-        // Sinh viên có thể xem thông tin cá nhân của mình
         public IActionResult Details(int id)
         {
             var role = HttpContext.Session.GetString("Role");
-            var username = HttpContext.Session.GetString("Username");
-            ViewBag.MaLop = _context.Lops.Select(l => new SelectListItem
+            var userId = HttpContext.Session.GetInt32("UserId");
+            if (role == "Admin" || role == "NguoiXetDuyet")
             {
-                Value = l.MaLop.ToString(),
-                Text = l.TenLop
-            }).ToList();
-            if (role == "SinhVien")
-            {
-                var sinhVien = _context.SinhViens.FirstOrDefault(sv => sv.MaSV == id && sv.Email == username);
-                if (sinhVien == null) return Unauthorized();
+                var sinhVien = _context.SinhViens
+                    .Include(sv => sv.Lop)
+                    .FirstOrDefault(sv => sv.MaSV == id);
+
+                if (sinhVien == null)
+                {
+                    return NotFound();
+                }
+
                 return View(sinhVien);
             }
-
-            if (role == "Admin")
+            else if (role == "SinhVien")
             {
-                var sinhVien = _context.SinhViens.Find(id);
+                var sinhVien = _context.SinhViens
+                    .Include(sv => sv.Lop)
+                    .FirstOrDefault(sv => sv.MaSV == id && sv.MaAccount == userId.Value);
+
+                if (sinhVien == null)
+                {
+                    return Forbid();
+                }
+
                 return View(sinhVien);
             }
-
-            return Unauthorized();
+            else
+            {
+                return Unauthorized();
+            }
         }
 
-        // Chỉ Admin được tạo sinh viên
+
         public IActionResult Create()
         {
-            if (HttpContext.Session.GetString("Role") != "Admin")
+            if (HttpContext.Session.GetString("Role") != "Admin" && HttpContext.Session.GetString("Role") != "NguoiXetDuyet")
             {
                 return Unauthorized();
             }
@@ -70,12 +99,10 @@ namespace demo_csdlnc.Controllers
         [HttpPost]
         public IActionResult Create(SinhVien sinhVien)
         {
-            if (HttpContext.Session.GetString("Role") != "Admin")
+            if (HttpContext.Session.GetString("Role") != "Admin" && HttpContext.Session.GetString("Role") != "NguoiXetDuyet")
             {
                 return Unauthorized();
             }
-
-            // Kiểm tra xem MaLop có tồn tại trong database không
             var lop = _context.Lops.Find(sinhVien.MaLop);
             if (lop == null)
             {
@@ -91,48 +118,95 @@ namespace demo_csdlnc.Controllers
 
         public IActionResult Edit(int id)
         {
-            if (HttpContext.Session.GetString("Role") != "Admin")
+            var userRole = HttpContext.Session.GetString("Role");
+            var userId = HttpContext.Session.GetInt32("UserId");
+
+            if (userRole == "SinhVien")
             {
-                return Unauthorized();
+                var sinhVien = _context.SinhViens.FirstOrDefault(s => s.MaAccount == userId);
+                ViewBag.MaLop = new SelectList(_context.Lops, "MaLop", "TenLop");
+                if (sinhVien == null || sinhVien.MaSV != id)
+                {
+                    return Unauthorized();
+                }
+                return View(sinhVien);
+            }
+            else if (userRole == "Admin" || userRole == "NguoiXetDuyet")
+            {
+                var sinhVien = _context.SinhViens.Find(id);
+                if (sinhVien == null) return NotFound();
+
+                ViewBag.MaLop = new SelectList(_context.Lops, "MaLop", "TenLop");
+                ViewBag.MaAccount = new SelectList(_context.Accounts, "MaAccount", "Username"); // Thêm danh sách tài khoản
+
+                return View(sinhVien);
             }
 
-            var sinhVien = _context.SinhViens.Find(id);
-            if (sinhVien == null) return NotFound();
-            ViewBag.MaLop = _context.Lops.Select(l => new SelectListItem
-            {
-                Value = l.MaLop.ToString(),
-                Text = l.TenLop
-            }).ToList();
-
-            return View(sinhVien);
+            return Unauthorized();
         }
 
+
+        
         [HttpPost]
         public IActionResult Edit(SinhVien sinhVien)
         {
-            if (HttpContext.Session.GetString("Role") != "Admin")
+            var userRole = HttpContext.Session.GetString("Role");
+            var userId = HttpContext.Session.GetInt32("UserId");
+
+            if (userRole == "SinhVien")
+            {
+                var existingSinhVien = _context.SinhViens.FirstOrDefault(s => s.MaAccount == userId);
+                if (existingSinhVien == null || existingSinhVien.MaSV != sinhVien.MaSV)
+                {
+                    return Unauthorized();
+                }
+                existingSinhVien.HoTen = sinhVien.HoTen;
+                existingSinhVien.NgaySinh = sinhVien.NgaySinh;
+                existingSinhVien.GioiTinh = sinhVien.GioiTinh;
+                existingSinhVien.Email = sinhVien.Email;
+                existingSinhVien.SoDienThoai = sinhVien.SoDienThoai;
+                existingSinhVien.MaLop = sinhVien.MaLop;
+            }
+            else if (userRole == "Admin" || userRole == "NguoiXetDuyet")
+            {
+                var existingSinhVien = _context.SinhViens.Find(sinhVien.MaSV);
+                if (existingSinhVien == null)
+                {
+                    return NotFound();
+                }
+
+                // Cập nhật thông tin của sinh viên
+                existingSinhVien.HoTen = sinhVien.HoTen;
+                existingSinhVien.NgaySinh = sinhVien.NgaySinh;
+                existingSinhVien.GioiTinh = sinhVien.GioiTinh;
+                existingSinhVien.Email = sinhVien.Email;
+                existingSinhVien.SoDienThoai = sinhVien.SoDienThoai;
+                existingSinhVien.MaLop = sinhVien.MaLop;
+                existingSinhVien.MaAccount = sinhVien.MaAccount; 
+
+                _context.SinhViens.Update(existingSinhVien);
+            }
+            else
             {
                 return Unauthorized();
             }
 
             if (ModelState.IsValid)
             {
-                _context.SinhViens.Update(sinhVien);
                 _context.SaveChanges();
                 return RedirectToAction("Index");
             }
-            ViewBag.MaLop = _context.Lops.Select(l => new SelectListItem
-            {
-                Value = l.MaLop.ToString(),
-                Text = l.TenLop
-            }).ToList();
+
+            ViewBag.MaLop = new SelectList(_context.Lops, "MaLop", "TenLop");
+            ViewBag.MaAccount = new SelectList(_context.Accounts, "MaAccount", "Username");
+
             return View(sinhVien);
         }
 
-        // 🔹 Chỉ Admin có thể xóa sinh viên
+
         public IActionResult Delete(int id)
         {
-            if (HttpContext.Session.GetString("Role") != "Admin")
+            if (HttpContext.Session.GetString("Role") != "Admin" && HttpContext.Session.GetString("Role") != "NguoiXetDuyet")
             {
                 return Unauthorized();
             }
@@ -146,7 +220,7 @@ namespace demo_csdlnc.Controllers
         [HttpPost, ActionName("Delete")]
         public IActionResult DeleteConfirmed(int id)
         {
-            if (HttpContext.Session.GetString("Role") != "Admin")
+            if (HttpContext.Session.GetString("Role") != "Admin" && HttpContext.Session.GetString("Role") != "NguoiXetDuyet")
             {
                 return Unauthorized();
             }
